@@ -8,11 +8,11 @@ Vamos implementar um sistema de vendas online com a possibilidade de realizar pe
 
 Para começar, faremos um projeto estruturado de forma simples, faça do jeito que você souber, depois vamos ir refatorando juntos.
 
-### Deve criar um pedido com 3 produtos (com descrição, preço e quantidade) e calcular o valor total
+#### Deve criar um pedido com 3 produtos (com descrição, preço e quantidade) e calcular o valor total
 
-### Deve criar um pedido com 3 produtos, associar um cupom de desconto e calcular o total (percentual sobre o total do pedido)
+#### Deve criar um pedido com 3 produtos, associar um cupom de desconto e calcular o total (percentual sobre o total do pedido)
 
-### Não deve criar um pedido com cpf inválido (lançar algum tipo de erro)
+#### Não deve criar um pedido com cpf inválido (lançar algum tipo de erro)
 
 - Faça a modelagem da forma que desejar e não se preocupe por enquanto, vamos implementar juntos na aula seguinte com influências de DDD e Clean Architecture
 - Utilize a sua linguagem e biblioteca de teste de sua preferência

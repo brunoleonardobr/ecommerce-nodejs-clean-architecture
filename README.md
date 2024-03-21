@@ -23,23 +23,23 @@ Para começar, faremos um projeto estruturado de forma simples, faça do jeito q
 
 ## branch etapa-2
 
-Vamos implementar um sistema de vendas online com a possibilidade de realizar pedidos com múltiplos itens, cada um deles com uma quantidade variável, calculando o frete, os impostos, aplicando um cupom de desconto e ainda interagindo com o estoque. Além disso teremos ainda fluxos de pagamento e cancelamento do pedido realizado.
+Implementar um sistema de vendas online com a possibilidade de realizar pedidos com múltiplos itens, cada um deles com uma quantidade variável, calculando o frete, os impostos, aplicando um cupom de desconto e ainda interagindo com o estoque. Além disso teremos ainda fluxos de pagamento e cancelamento do pedido realizado.
 
-Para começar, faremos um projeto estruturado de forma simples, faça do jeito que você souber, depois vamos ir refatorando juntos.
+Para começar, faça um projeto estruturado de forma simples, faça do jeito que você souber, que possa ser refatorado depois.
 
-### Não deve aplicar cupom de desconto expirado
+#### Não deve aplicar cupom de desconto expirado
 
-### Ao fazer um pedido, a quantidade de um item não pode ser negativa
+#### Ao fazer um pedido, a quantidade de um item não pode ser negativa
 
-### Ao fazer um pedido, o mesmo item não pode ser informado mais de uma vez
+#### Ao fazer um pedido, o mesmo item não pode ser informado mais de uma vez
 
-### Nenhuma dimensão do item pode ser negativa
+#### Nenhuma dimensão do item pode ser negativa
 
-### O peso do item não pode ser negativo
+#### O peso do item não pode ser negativo
 
-### Deve calcular o valor do frete com base nas dimensões (altura, largura e profundidade em cm) e o peso dos produtos (em kg)
+#### Deve calcular o valor do frete com base nas dimensões (altura, largura e profundidade em cm) e o peso dos produtos (em kg)
 
-### Deve retornar o preço mínimo de frete caso ele seja superior ao valor calculado
+#### Deve retornar o preço mínimo de frete caso ele seja superior ao valor calculado
 
 - Faça a modelagem da forma que desejar e não se preocupe por enquanto, vamos implementar juntos na aula seguinte com influências de DDD e Clean Architecture
 - Utilize a sua linguagem e biblioteca de teste de sua preferência

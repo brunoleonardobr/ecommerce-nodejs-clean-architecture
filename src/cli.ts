@@ -28,6 +28,13 @@ process.stdin.on("data", (data) => {
   }
   if (command.startsWith("checkout")) {
     console.log("checkout");
+    const checkout = new Checkout();
+    try {
+      const output = await checkout(input);
+      console.log(output);
+    } catch (error) {
+      console.log(error.message);
+    }
     return;
   }
   if (command.startsWith("quit")) {

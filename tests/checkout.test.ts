@@ -3,12 +3,20 @@ import Checkout from "../src/checkout";
 
 import ProductRepository from "../src/ProductRepository";
 import CouponRepository from "../src/CouponRepository";
+import crypto from "crypto";
+import GetOrder from "../src/GetOrder";
+import OrderRepositoryDatabase from "../src/OrderRepositoryDatabase";
 
 axios.defaults.validateStatus = () => {
   return true;
 };
 
 let checkout: Checkout;
+let getOrder: GetOrder;
+let orderRepository: OrderRepositoryDatabase;
+let productRepository: ProductRepository;
+let couponRepository: CouponRepository;
+
 beforeEach(() => {
   const products: any = {
     1: {
@@ -57,7 +65,7 @@ beforeEach(() => {
       weight: -3,
     },
   };
-  const productRepository: ProductRepository = {
+  productRepository = {
     async get(productId: number): Promise<any> {
       return products[productId];
     },
@@ -72,12 +80,15 @@ beforeEach(() => {
       expire_date: new Date(2025, 12, 1),
     },
   };
-  const couponRepository: CouponRepository = {
+  couponRepository = {
     async get(coupon: string): Promise<any> {
       return coupons[coupon];
     },
   };
-  checkout = new Checkout(productRepository, couponRepository);
+
+  orderRepository = new OrderRepositoryDatabase();
+  checkout = new Checkout(productRepository, couponRepository, orderRepository);
+  getOrder = new GetOrder(orderRepository);
 });
 
 test("Não deve criar pedido com cpf inválido", async () => {
@@ -92,6 +103,7 @@ test("Não deve criar pedido com cpf inválido", async () => {
 
 test("Deve fazer um pedido com 3 items", async () => {
   const input = {
+    idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
       { productId: 1, quantity: 1 },
@@ -105,6 +117,7 @@ test("Deve fazer um pedido com 3 items", async () => {
 
 test("Deve fazer um pedido com 3 items com cupom de desconto", async () => {
   const input = {
+    idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
       { productId: 1, quantity: 1 },
@@ -119,6 +132,7 @@ test("Deve fazer um pedido com 3 items com cupom de desconto", async () => {
 
 test("Não deve aplicar cupom de desconto expirado", async () => {
   const input = {
+    idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
       { productId: 1, quantity: 1 },
@@ -133,6 +147,7 @@ test("Não deve aplicar cupom de desconto expirado", async () => {
 
 test("Não deve aplicar cupom de desconto que não existe", async () => {
   const input = {
+    idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
       { productId: 1, quantity: 1 },
@@ -202,6 +217,7 @@ test("O peso do item não pode ser negativo", async () => {
 
 test("Deve calcular o valor do frete com base nas dimensões (altura, largura e profundidade em cm) e o peso dos produtos (em kg)", async () => {
   const input = {
+    idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
       { productId: 1, quantity: 1 },
@@ -218,6 +234,7 @@ test("Deve calcular o valor do frete com base nas dimensões (altura, largura e 
 
 test("Deve retornar o preço mínimo de frete caso ele seja superior ao valor calculado", async () => {
   const input = {
+    idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
       { productId: 1, quantity: 1 },
@@ -235,6 +252,7 @@ test("Deve retornar o preço mínimo de frete caso ele seja superior ao valor ca
 
 test("Deve fazer um pedido com 3 items com envio de email", async () => {
   const input = {
+    idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
       { productId: 1, quantity: 1 },
@@ -245,4 +263,47 @@ test("Deve fazer um pedido com 3 items com envio de email", async () => {
   };
   const output = await checkout.execute(input);
   expect(output.total).toBe(6090);
+});
+
+test("Deve fazer um pedido, salvando no banco de dados", async () => {
+  const idOrder = await crypto.randomUUID();
+  const input = {
+    idOrder,
+    cpf: "407.302.170-27",
+    items: [
+      { productId: 1, quantity: 1 },
+      { productId: 2, quantity: 1 },
+      { productId: 3, quantity: 3 },
+    ],
+  };
+  await checkout.execute(input);
+  const output = await getOrder.execute(idOrder);
+  expect(output.total).toBe(6090);
+});
+
+test("Deve fazer um pedido, e gerar o codigo do pedido", async () => {
+  await orderRepository.clear();
+  await checkout.execute({
+    idOrder: crypto.randomUUID(),
+    cpf: "407.302.170-27",
+    items: [
+      { productId: 1, quantity: 1 },
+      { productId: 2, quantity: 1 },
+      { productId: 3, quantity: 3 },
+    ],
+    date: new Date("2022-01-01T10:00:00"),
+  });
+  const input = {
+    idOrder: crypto.randomUUID(),
+    cpf: "407.302.170-27",
+    items: [
+      { productId: 1, quantity: 1 },
+      { productId: 2, quantity: 1 },
+      { productId: 3, quantity: 3 },
+    ],
+    date: new Date("2022-01-01T10:00:00"),
+  };
+  await checkout.execute(input);
+  const output = await getOrder.execute(input.idOrder);
+  expect(output.code).toBe(`202200000002`);
 });

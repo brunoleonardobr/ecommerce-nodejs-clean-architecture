@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "nodemon src/api.ts"
+    "start": "nodemon src/api_rest.ts"
   },
   "dependencies": {
     "@types/express": "^4.17.17",

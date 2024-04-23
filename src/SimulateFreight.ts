@@ -8,7 +8,7 @@ export default class SimulateFreight {
     };
     for (const item of input.items) {
       if (input.from && input.to) {
-        const product = await this.productRepository.get(item.productId);
+        const product = await this.productRepository.get(item.idProduct);
         const volume =
           (product.width / 100) *
           (product.height / 100) *
@@ -24,7 +24,7 @@ export default class SimulateFreight {
 }
 
 type Input = {
-  items: { productId: number; quantity: number }[];
+  items: { idProduct: number; quantity: number }[];
   from?: string;
   to?: string;
 };

@@ -1,5 +1,5 @@
 import axios from "axios";
-import Checkout from "../src/checkout";
+import Checkout from "../src/Checkout";
 
 import ProductRepository from "../src/ProductRepository";
 import CouponRepository from "../src/CouponRepository";
@@ -20,7 +20,7 @@ let couponRepository: CouponRepository;
 beforeEach(() => {
   const products: any = {
     1: {
-      productId: 1,
+      idProduct: 1,
       description: "A",
       price: 1000,
       width: 100,
@@ -29,7 +29,7 @@ beforeEach(() => {
       weight: 3,
     },
     2: {
-      productId: 2,
+      idProduct: 2,
       description: "B",
       price: 5000,
       width: 50,
@@ -38,7 +38,7 @@ beforeEach(() => {
       weight: 22,
     },
     3: {
-      productId: 3,
+      idProduct: 3,
       description: "C",
       price: 30,
       width: 10,
@@ -47,7 +47,7 @@ beforeEach(() => {
       weight: 0.9,
     },
     4: {
-      productId: 4,
+      idProduct: 4,
       description: "D",
       price: 1000,
       width: -100,
@@ -56,7 +56,7 @@ beforeEach(() => {
       weight: 3,
     },
     5: {
-      productId: 5,
+      idProduct: 5,
       description: "E",
       price: 1000,
       width: 100,
@@ -66,8 +66,8 @@ beforeEach(() => {
     },
   };
   productRepository = {
-    async get(productId: number): Promise<any> {
-      return products[productId];
+    async get(idProduct: number): Promise<any> {
+      return products[idProduct];
     },
   };
   const coupons: any = {
@@ -106,9 +106,9 @@ test("Deve fazer um pedido com 3 items", async () => {
     idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 2, quantity: 1 },
-      { productId: 3, quantity: 3 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 2, quantity: 1 },
+      { idProduct: 3, quantity: 3 },
     ],
   };
   const output = await checkout.execute(input);
@@ -120,9 +120,9 @@ test("Deve fazer um pedido com 3 items com cupom de desconto", async () => {
     idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 2, quantity: 1 },
-      { productId: 3, quantity: 3 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 2, quantity: 1 },
+      { idProduct: 3, quantity: 3 },
     ],
     coupon: "VALE20",
   };
@@ -135,9 +135,9 @@ test("Não deve aplicar cupom de desconto expirado", async () => {
     idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 2, quantity: 1 },
-      { productId: 3, quantity: 3 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 2, quantity: 1 },
+      { idProduct: 3, quantity: 3 },
     ],
     coupon: "VALE10",
   };
@@ -150,9 +150,9 @@ test("Não deve aplicar cupom de desconto que não existe", async () => {
     idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 2, quantity: 1 },
-      { productId: 3, quantity: 3 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 2, quantity: 1 },
+      { idProduct: 3, quantity: 3 },
     ],
     coupon: "VALE0",
   };
@@ -164,9 +164,9 @@ test("Ao fazer um pedido, a quantidade de um item não pode ser negativa", async
   const input = {
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 2, quantity: 1 },
-      { productId: 3, quantity: -1 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 2, quantity: 1 },
+      { idProduct: 3, quantity: -1 },
     ],
   };
   expect(() => checkout.execute(input)).rejects.toThrow(
@@ -178,8 +178,8 @@ test("Ao fazer um pedido, o mesmo item não pode ser informado mais de uma vez",
   const input = {
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 1, quantity: 1 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 1, quantity: 1 },
     ],
   };
   expect(() => checkout.execute(input)).rejects.toThrow(
@@ -191,9 +191,9 @@ test("Nenhuma dimensão do item pode ser negativa", async () => {
   const input = {
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 2, quantity: 1 },
-      { productId: 4, quantity: 3 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 2, quantity: 1 },
+      { idProduct: 4, quantity: 3 },
     ],
   };
   expect(() => checkout.execute(input)).rejects.toThrow(
@@ -205,9 +205,9 @@ test("O peso do item não pode ser negativo", async () => {
   const input = {
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 2, quantity: 1 },
-      { productId: 5, quantity: 3 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 2, quantity: 1 },
+      { idProduct: 5, quantity: 3 },
     ],
   };
   expect(() => checkout.execute(input)).rejects.toThrow(
@@ -220,8 +220,8 @@ test("Deve calcular o valor do frete com base nas dimensões (altura, largura e 
     idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 2, quantity: 1 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 2, quantity: 1 },
     ],
     from: "88015600",
     to: "22030060",
@@ -237,9 +237,9 @@ test("Deve retornar o preço mínimo de frete caso ele seja superior ao valor ca
     idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 2, quantity: 1 },
-      { productId: 3, quantity: 3 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 2, quantity: 1 },
+      { idProduct: 3, quantity: 3 },
     ],
     from: "88015600",
     to: "22030060",
@@ -255,9 +255,9 @@ test("Deve fazer um pedido com 3 items com envio de email", async () => {
     idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 2, quantity: 1 },
-      { productId: 3, quantity: 3 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 2, quantity: 1 },
+      { idProduct: 3, quantity: 3 },
     ],
     email: "john.doe@mail.com",
   };
@@ -271,9 +271,9 @@ test("Deve fazer um pedido, salvando no banco de dados", async () => {
     idOrder,
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 2, quantity: 1 },
-      { productId: 3, quantity: 3 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 2, quantity: 1 },
+      { idProduct: 3, quantity: 3 },
     ],
   };
   await checkout.execute(input);
@@ -287,9 +287,9 @@ test("Deve fazer um pedido, e gerar o codigo do pedido", async () => {
     idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 2, quantity: 1 },
-      { productId: 3, quantity: 3 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 2, quantity: 1 },
+      { idProduct: 3, quantity: 3 },
     ],
     date: new Date("2022-01-01T10:00:00"),
   });
@@ -297,9 +297,9 @@ test("Deve fazer um pedido, e gerar o codigo do pedido", async () => {
     idOrder: crypto.randomUUID(),
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 2, quantity: 1 },
-      { productId: 3, quantity: 3 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 2, quantity: 1 },
+      { idProduct: 3, quantity: 3 },
     ],
     date: new Date("2022-01-01T10:00:00"),
   };

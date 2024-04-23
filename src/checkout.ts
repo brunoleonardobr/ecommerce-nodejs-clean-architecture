@@ -25,9 +25,9 @@ export default class Checkout {
         for (const item of items) {
           if (item.quantity <= 0) throw new Error("Invalid quantity");
           const isProductDuplicated =
-            items.filter((i: any) => i.productId === item.productId).length > 1;
+            items.filter((i: any) => i.idProduct === item.idProduct).length > 1;
           if (isProductDuplicated) throw new Error("Duplicated item");
-          const product = await this.productRepository.get(item.productId);
+          const product = await this.productRepository.get(item.idProduct);
           if (product.width <= 0 || product.height <= 0 || product.length <= 0)
             throw new Error("Invalid dimensions");
           if (product.weight <= 0) throw new Error("Invalid weight");
@@ -78,7 +78,7 @@ export default class Checkout {
 type Input = {
   idOrder?: string;
   cpf: string;
-  items: { productId: number; quantity: number }[];
+  items: { idProduct: number; quantity: number }[];
   from?: string;
   to?: string;
   date?: Date;

@@ -5,9 +5,9 @@ test("deve simular o frete", async () => {
   const input = {
     cpf: "407.302.170-27",
     items: [
-      { productId: 1, quantity: 1 },
-      { productId: 2, quantity: 1 },
-      { productId: 3, quantity: 3 },
+      { idProduct: 1, quantity: 1 },
+      { idProduct: 2, quantity: 1 },
+      { idProduct: 3, quantity: 3 },
     ],
     from: "88015600",
     to: "22030060",

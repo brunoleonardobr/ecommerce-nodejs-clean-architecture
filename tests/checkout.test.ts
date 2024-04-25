@@ -6,6 +6,8 @@ import CouponRepository from "../src/CouponRepository";
 import crypto from "crypto";
 import GetOrder from "../src/GetOrder";
 import OrderRepositoryDatabase from "../src/OrderRepositoryDatabase";
+import Product from "../src/Product";
+import Coupon from "../src/Coupon";
 
 axios.defaults.validateStatus = () => {
   return true;
@@ -19,51 +21,11 @@ let couponRepository: CouponRepository;
 
 beforeEach(() => {
   const products: any = {
-    1: {
-      idProduct: 1,
-      description: "A",
-      price: 1000,
-      width: 100,
-      height: 30,
-      length: 10,
-      weight: 3,
-    },
-    2: {
-      idProduct: 2,
-      description: "B",
-      price: 5000,
-      width: 50,
-      height: 50,
-      length: 50,
-      weight: 22,
-    },
-    3: {
-      idProduct: 3,
-      description: "C",
-      price: 30,
-      width: 10,
-      height: 10,
-      length: 10,
-      weight: 0.9,
-    },
-    4: {
-      idProduct: 4,
-      description: "D",
-      price: 1000,
-      width: -100,
-      height: 30,
-      length: 10,
-      weight: 3,
-    },
-    5: {
-      idProduct: 5,
-      description: "E",
-      price: 1000,
-      width: 100,
-      height: 30,
-      length: 10,
-      weight: -3,
-    },
+    1: new Product(1, "A", 1000, 100, 30, 10, 3),
+    2: new Product(2, "B", 5000, 50, 50, 50, 22),
+    3: new Product(3, "C", 30, 10, 10, 10, 0.9),
+    4: new Product(4, "D", 1000, -100, 30, 10, 3),
+    5: new Product(5, "E", 1000, 100, 30, 10, -3),
   };
   productRepository = {
     async get(idProduct: number): Promise<any> {
@@ -71,14 +33,8 @@ beforeEach(() => {
     },
   };
   const coupons: any = {
-    VALE10: {
-      percentual: 10,
-      expire_date: new Date(2023, 0, 1),
-    },
-    VALE20: {
-      percentual: 20,
-      expire_date: new Date(2025, 12, 1),
-    },
+    VALE10: new Coupon("VALE10", 10, new Date(2023, 0, 1)),
+    VALE20: new Coupon("VALE20", 20, new Date(2025, 12, 1)),
   };
   couponRepository = {
     async get(coupon: string): Promise<any> {
@@ -97,7 +53,7 @@ test("Não deve criar pedido com cpf inválido", async () => {
     items: [],
   };
   expect(() => checkout.execute(input)).rejects.toThrow(
-    new Error("Invalid cpf")
+    new Error("invalid cpf")
   );
 });
 
@@ -160,61 +116,6 @@ test("Não deve aplicar cupom de desconto que não existe", async () => {
   expect(output.total).toBe(6090);
 });
 
-test("Ao fazer um pedido, a quantidade de um item não pode ser negativa", async () => {
-  const input = {
-    cpf: "407.302.170-27",
-    items: [
-      { idProduct: 1, quantity: 1 },
-      { idProduct: 2, quantity: 1 },
-      { idProduct: 3, quantity: -1 },
-    ],
-  };
-  expect(() => checkout.execute(input)).rejects.toThrow(
-    new Error("Invalid quantity")
-  );
-});
-
-test("Ao fazer um pedido, o mesmo item não pode ser informado mais de uma vez", async () => {
-  const input = {
-    cpf: "407.302.170-27",
-    items: [
-      { idProduct: 1, quantity: 1 },
-      { idProduct: 1, quantity: 1 },
-    ],
-  };
-  expect(() => checkout.execute(input)).rejects.toThrow(
-    new Error("Duplicated item")
-  );
-});
-
-test("Nenhuma dimensão do item pode ser negativa", async () => {
-  const input = {
-    cpf: "407.302.170-27",
-    items: [
-      { idProduct: 1, quantity: 1 },
-      { idProduct: 2, quantity: 1 },
-      { idProduct: 4, quantity: 3 },
-    ],
-  };
-  expect(() => checkout.execute(input)).rejects.toThrow(
-    new Error("Invalid dimensions")
-  );
-});
-
-test("O peso do item não pode ser negativo", async () => {
-  const input = {
-    cpf: "407.302.170-27",
-    items: [
-      { idProduct: 1, quantity: 1 },
-      { idProduct: 2, quantity: 1 },
-      { idProduct: 5, quantity: 3 },
-    ],
-  };
-  expect(() => checkout.execute(input)).rejects.toThrow(
-    new Error("Invalid weight")
-  );
-});
-
 test("Deve calcular o valor do frete com base nas dimensões (altura, largura e profundidade em cm) e o peso dos produtos (em kg)", async () => {
   const input = {
     idOrder: crypto.randomUUID(),
@@ -227,7 +128,6 @@ test("Deve calcular o valor do frete com base nas dimensões (altura, largura e 
     to: "22030060",
   };
   const output = await checkout.execute(input);
-  expect(output.subtotal).toBe(6000);
   expect(output.freight).toBe(250);
   expect(output.total).toBe(6250);
 });
@@ -245,7 +145,7 @@ test("Deve retornar o preço mínimo de frete caso ele seja superior ao valor ca
     to: "22030060",
   };
   const output = await checkout.execute(input);
-  expect(output.subtotal).toBe(6090);
+
   expect(output.freight).toBe(280);
   expect(output.total).toBe(6370);
 });

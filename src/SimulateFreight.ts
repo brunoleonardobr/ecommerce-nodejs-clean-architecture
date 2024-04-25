@@ -1,3 +1,4 @@
+import FreightCalculator from "./FreightCalculator";
 import type ProductRepository from "./ProductRepository";
 
 export default class SimulateFreight {
@@ -9,13 +10,7 @@ export default class SimulateFreight {
     for (const item of input.items) {
       if (input.from && input.to) {
         const product = await this.productRepository.get(item.idProduct);
-        const volume =
-          (product.width / 100) *
-          (product.height / 100) *
-          (product.length / 100);
-        const density = parseFloat(product.weight) / volume;
-        let freight = volume * 1000 * (density / 100);
-        freight = Math.max(10, freight);
+        const freight = FreightCalculator.calculate(product);
         output.freight += freight * item.quantity;
       }
     }

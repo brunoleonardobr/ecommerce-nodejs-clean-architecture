@@ -1,5 +1,6 @@
 import mysql from "mysql2/promise";
 import OrderRepository from "./OrderRepository";
+import type Order from "./Order";
 
 export default class OrderRepositoryDatabase implements OrderRepository {
   async count(): Promise<number> {
@@ -18,12 +19,18 @@ export default class OrderRepositoryDatabase implements OrderRepository {
     connection.commit();
     connection.destroy();
   }
-  async save(order: any): Promise<void> {
+  async save(order: Order): Promise<void> {
     const connectionString = `mysql://root:admin@localhost:3306/ecommerce`;
     const connection = await mysql.createConnection(connectionString);
     await connection.execute<any>(
       `INSERT INTO orders (id_order, code, cpf, total, freight) VALUES (?, ?, ?, ?, ?);`,
-      [order.idOrder, order.code, order.cpf, order.total, order.freight]
+      [
+        order.idOrder,
+        order.code,
+        order.cpf.value,
+        order.getTotal(),
+        order.freight,
+      ]
     );
     connection.commit();
     connection.destroy();

@@ -1,5 +1,6 @@
 import mysql from "mysql2/promise";
 import CouponRepository from "./CouponRepository";
+import Coupon from "./Coupon";
 
 export default class CouponRepositoryDatabase implements CouponRepository {
   async get(coupon: string) {
@@ -8,6 +9,10 @@ export default class CouponRepositoryDatabase implements CouponRepository {
     const statement = `SELECT * FROM coupons WHERE coupon=?;`;
     const [couponData] = await connection.query<any>(statement, [coupon]);
     connection.destroy();
-    return couponData[0];
+    return new Coupon(
+      couponData[0].code,
+      parseFloat(couponData[0].percentual),
+      couponData[0].expire_date
+    );
   }
 }

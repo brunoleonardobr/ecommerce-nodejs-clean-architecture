@@ -6,7 +6,6 @@ import OrderRepository from "./OrderRepository";
 import OrderRepositoryDatabase from "./OrderRepositoryDatabase";
 import ProductRepository from "./ProductRepository";
 import ProductRepositoryDatabase from "./ProductRepositoryDatabase";
-import { validate } from "./validateCpf";
 
 export default class Checkout {
   constructor(

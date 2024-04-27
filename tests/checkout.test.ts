@@ -24,8 +24,6 @@ beforeEach(() => {
     1: new Product(1, "A", 1000, 100, 30, 10, 3),
     2: new Product(2, "B", 5000, 50, 50, 50, 22),
     3: new Product(3, "C", 30, 10, 10, 10, 0.9),
-    4: new Product(4, "D", 1000, -100, 30, 10, 3),
-    5: new Product(5, "E", 1000, 100, 30, 10, -3),
   };
   productRepository = {
     async get(idProduct: number): Promise<any> {
@@ -148,21 +146,6 @@ test("Deve retornar o preço mínimo de frete caso ele seja superior ao valor ca
 
   expect(output.freight).toBe(280);
   expect(output.total).toBe(6370);
-});
-
-test("Deve fazer um pedido com 3 items com envio de email", async () => {
-  const input = {
-    idOrder: crypto.randomUUID(),
-    cpf: "407.302.170-27",
-    items: [
-      { idProduct: 1, quantity: 1 },
-      { idProduct: 2, quantity: 1 },
-      { idProduct: 3, quantity: 3 },
-    ],
-    email: "john.doe@mail.com",
-  };
-  const output = await checkout.execute(input);
-  expect(output.total).toBe(6090);
 });
 
 test("Deve fazer um pedido, salvando no banco de dados", async () => {

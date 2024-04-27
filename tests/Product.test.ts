@@ -10,13 +10,13 @@ test("Deve calcular a densidade", () => {
   expect(product.getDensity()).toBe(100);
 });
 
-test.skip("não deve criar produto com dimensoes invalidas", () => {
+test("não deve criar produto com dimensoes invalidas", () => {
   expect(() => new Product(1, "A", 1000, -100, 30, 10, 3)).toThrow(
     new Error("invalid dimensions")
   );
 });
 
-test.skip("não deve criar produto com peso invalido", () => {
+test("não deve criar produto com peso invalido", () => {
   expect(() => new Product(1, "A", 1000, 100, 30, 10, -3)).toThrow(
     new Error("invalid weight")
   );

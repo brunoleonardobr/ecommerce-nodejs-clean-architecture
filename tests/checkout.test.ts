@@ -1,13 +1,9 @@
 import axios from "axios";
 import Checkout from "../src/Checkout";
-
-import ProductRepository from "../src/ProductRepository";
-import CouponRepository from "../src/CouponRepository";
 import crypto from "crypto";
 import GetOrder from "../src/GetOrder";
 import OrderRepositoryDatabase from "../src/OrderRepositoryDatabase";
-import Product from "../src/Product";
-import Coupon from "../src/Coupon";
+import DatabaseRepositoryFactory from "../src/DatabaseRepositoryFactory";
 
 axios.defaults.validateStatus = () => {
   return true;
@@ -15,34 +11,11 @@ axios.defaults.validateStatus = () => {
 
 let checkout: Checkout;
 let getOrder: GetOrder;
-let orderRepository: OrderRepositoryDatabase;
-let productRepository: ProductRepository;
-let couponRepository: CouponRepository;
 
 beforeEach(() => {
-  const products: any = {
-    1: new Product(1, "A", 1000, 100, 30, 10, 3),
-    2: new Product(2, "B", 5000, 50, 50, 50, 22),
-    3: new Product(3, "C", 30, 10, 10, 10, 0.9),
-  };
-  productRepository = {
-    async get(idProduct: number): Promise<any> {
-      return products[idProduct];
-    },
-  };
-  const coupons: any = {
-    VALE10: new Coupon("VALE10", 10, new Date(2023, 0, 1)),
-    VALE20: new Coupon("VALE20", 20, new Date(2025, 12, 1)),
-  };
-  couponRepository = {
-    async get(coupon: string): Promise<any> {
-      return coupons[coupon];
-    },
-  };
-
-  orderRepository = new OrderRepositoryDatabase();
-  checkout = new Checkout(productRepository, couponRepository, orderRepository);
-  getOrder = new GetOrder(orderRepository);
+  const repositoryFactory = new DatabaseRepositoryFactory();
+  checkout = new Checkout(repositoryFactory);
+  getOrder = new GetOrder(repositoryFactory);
 });
 
 test("Não deve criar pedido com cpf inválido", async () => {
@@ -165,6 +138,7 @@ test("Deve fazer um pedido, salvando no banco de dados", async () => {
 });
 
 test("Deve fazer um pedido, e gerar o codigo do pedido", async () => {
+  let orderRepository = new OrderRepositoryDatabase();
   await orderRepository.clear();
   await checkout.execute({
     idOrder: crypto.randomUUID(),

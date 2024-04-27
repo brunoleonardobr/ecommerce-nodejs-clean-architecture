@@ -1,18 +1,19 @@
 import CouponRepository from "./CouponRepository";
-import CouponRepositoryDatabase from "./CouponRepositoryDatabase";
 import FreightCalculator from "./FreightCalculator";
 import Order from "./Order";
 import OrderRepository from "./OrderRepository";
-import OrderRepositoryDatabase from "./OrderRepositoryDatabase";
 import ProductRepository from "./ProductRepository";
-import ProductRepositoryDatabase from "./ProductRepositoryDatabase";
+import RepositoryFactory from "./RepositoryFactory";
 
 export default class Checkout {
-  constructor(
-    readonly productRepository: ProductRepository = new ProductRepositoryDatabase(),
-    readonly couponRepository: CouponRepository = new CouponRepositoryDatabase(),
-    readonly orderRepository: OrderRepository = new OrderRepositoryDatabase()
-  ) {}
+  orderRepository: OrderRepository;
+  productRepository: ProductRepository;
+  couponRepository: CouponRepository;
+  constructor(repositoryFactory: RepositoryFactory) {
+    this.orderRepository = repositoryFactory.createOrderRepository();
+    this.productRepository = repositoryFactory.createProductRepository();
+    this.couponRepository = repositoryFactory.createCouponRepository();
+  }
   async execute(input: Input): Promise<Output> {
     const sequence = await this.orderRepository.count();
     const order = new Order(input.idOrder, input.cpf, input.date, sequence + 1);

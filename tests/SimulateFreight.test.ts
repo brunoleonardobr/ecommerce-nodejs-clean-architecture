@@ -1,4 +1,4 @@
-import ProductRepositoryDatabase from "../src/ProductRepositoryDatabase";
+import DatabaseRepositoryFactory from "../src/DatabaseRepositoryFactory";
 import SimulateFreight from "../src/SimulateFreight";
 
 test("deve simular o frete", async () => {
@@ -12,8 +12,8 @@ test("deve simular o frete", async () => {
     from: "88015600",
     to: "22030060",
   };
-  const productRepository = new ProductRepositoryDatabase();
-  const simulateFreight = new SimulateFreight(productRepository);
+  const repositoryFactory = new DatabaseRepositoryFactory();
+  const simulateFreight = new SimulateFreight(repositoryFactory);
   const output = await simulateFreight.execute(input);
   expect(output.freight).toBe(280);
 });

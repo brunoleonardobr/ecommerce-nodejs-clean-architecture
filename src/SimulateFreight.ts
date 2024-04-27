@@ -1,8 +1,12 @@
 import FreightCalculator from "./FreightCalculator";
 import type ProductRepository from "./ProductRepository";
+import type RepositoryFactory from "./RepositoryFactory";
 
 export default class SimulateFreight {
-  constructor(readonly productRepository: ProductRepository) {}
+  productRepository: ProductRepository;
+  constructor(repositoryFactory: RepositoryFactory) {
+    this.productRepository = repositoryFactory.createProductRepository();
+  }
   async execute(input: Input): Promise<Output> {
     const output = {
       freight: 0,

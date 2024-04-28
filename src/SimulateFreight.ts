@@ -1,6 +1,6 @@
 import FreightCalculator from "./FreightCalculator";
-import type ProductRepository from "./ProductRepository";
-import type RepositoryFactory from "./RepositoryFactory";
+import ProductRepository from "./ProductRepository";
+import RepositoryFactory from "./RepositoryFactory";
 
 export default class SimulateFreight {
   productRepository: ProductRepository;

@@ -1,4 +1,4 @@
-import type Coupon from "./Coupon";
+import Coupon from "./Coupon";
 import Cpf from "./Cpf";
 import Item from "./Item";
 import Product from "./Product";

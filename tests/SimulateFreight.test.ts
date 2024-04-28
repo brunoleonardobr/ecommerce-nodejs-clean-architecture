@@ -1,4 +1,5 @@
 import DatabaseRepositoryFactory from "../src/DatabaseRepositoryFactory";
+import MysqlPromiseAdapter from "../src/MysqlPromiseAdapter";
 import SimulateFreight from "../src/SimulateFreight";
 
 test("deve simular o frete", async () => {
@@ -12,8 +13,11 @@ test("deve simular o frete", async () => {
     from: "88015600",
     to: "22030060",
   };
-  const repositoryFactory = new DatabaseRepositoryFactory();
+  const connection = new MysqlPromiseAdapter();
+  await connection.connect();
+  const repositoryFactory = new DatabaseRepositoryFactory(connection);
   const simulateFreight = new SimulateFreight(repositoryFactory);
   const output = await simulateFreight.execute(input);
   expect(output.freight).toBe(280);
+  await connection.close();
 });

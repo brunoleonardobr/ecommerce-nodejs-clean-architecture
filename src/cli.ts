@@ -1,3 +1,7 @@
+import DatabaseRepositoryFactory from "./DatabaseRepositoryFactory";
+import MysqlPromiseAdapter from "./MysqlPromiseAdapter";
+import UseCaseFactory from "./UseCaseFactory";
+
 const input: {
   cpf: string;
   items: { idProduct: number; quantity: number }[];
@@ -7,9 +11,10 @@ const input: {
 } = {
   cpf: "",
   items: [],
+  to: "",
 };
 
-process.stdin.on("data", (data) => {
+process.stdin.on("data", async (data) => {
   const command = data.toString().replace(/\n/g, "");
   if (command.startsWith("set-cpf")) {
     input.cpf = command.replace("set-cpf ", "");
@@ -28,11 +33,15 @@ process.stdin.on("data", (data) => {
   }
   if (command.startsWith("checkout")) {
     console.log("checkout");
-    const checkout = new Checkout();
+    const connection = new MysqlPromiseAdapter();
+    connection.connect();
+    const repositoryFactory = new DatabaseRepositoryFactory(connection);
+    const useCaseFactory = new UseCaseFactory(repositoryFactory);
+    const checkout = useCaseFactory.createCheckout();
     try {
-      const output = await checkout(input);
+      const output = await checkout.execute(input);
       console.log(output);
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.message);
     }
     return;

@@ -1,14 +1,13 @@
-import mysql from "mysql2/promise";
 import CouponRepository from "./CouponRepository";
 import Coupon from "./Coupon";
+import DatabaseConnection from "./DatabaseConnection";
 
 export default class CouponRepositoryDatabase implements CouponRepository {
+  constructor(readonly connection: DatabaseConnection) {}
   async get(coupon: string) {
-    const connectionString = `mysql://root:admin@localhost:3306/ecommerce`;
-    const connection = await mysql.createConnection(connectionString);
     const statement = `SELECT * FROM coupons WHERE coupon=?;`;
-    const [couponData] = await connection.query<any>(statement, [coupon]);
-    connection.destroy();
+    const [couponData] = await this.connection.query(statement, [coupon]);
+    if (!couponData[0]) return undefined;
     return new Coupon(
       couponData[0].code,
       parseFloat(couponData[0].percentual),

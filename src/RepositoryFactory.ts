@@ -1,6 +1,6 @@
-import type CouponRepository from "./CouponRepository";
-import type OrderRepository from "./OrderRepository";
-import type ProductRepository from "./ProductRepository";
+import CouponRepository from "./CouponRepository";
+import OrderRepository from "./OrderRepository";
+import ProductRepository from "./ProductRepository";
 
 export default interface RepositoryFactory {
   createOrderRepository(): OrderRepository;

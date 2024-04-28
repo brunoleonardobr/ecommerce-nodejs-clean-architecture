@@ -1,5 +1,5 @@
-import type Coupon from "./Coupon";
+import Coupon from "./Coupon";
 
 export default interface CouponRepository {
-  get(coupon: string): Promise<Coupon>;
+  get(coupon: string): Promise<Coupon | undefined>;
 }

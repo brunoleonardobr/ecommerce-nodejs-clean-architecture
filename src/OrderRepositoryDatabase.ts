@@ -1,28 +1,20 @@
-import mysql from "mysql2/promise";
 import OrderRepository from "./OrderRepository";
-import type Order from "./Order";
+import Order from "./Order";
+import DatabaseConnection from "./DatabaseConnection";
 
 export default class OrderRepositoryDatabase implements OrderRepository {
+  constructor(readonly connection: DatabaseConnection) {}
   async count(): Promise<number> {
-    const connectionString = `mysql://root:admin@localhost:3306/ecommerce`;
-    const connection = await mysql.createConnection(connectionString);
-    const [orders] = await connection.query<any>(
+    const [orders] = await this.connection.query(
       `SELECT count(*) AS quant FROM orders;`
     );
-    connection.destroy();
     return orders[0].quant;
   }
   async clear(): Promise<void> {
-    const connectionString = `mysql://root:admin@localhost:3306/ecommerce`;
-    const connection = await mysql.createConnection(connectionString);
-    await connection.execute<any>(`DELETE FROM orders;`);
-    connection.commit();
-    connection.destroy();
+    await this.connection.query(`DELETE FROM orders;`);
   }
   async save(order: Order): Promise<void> {
-    const connectionString = `mysql://root:admin@localhost:3306/ecommerce`;
-    const connection = await mysql.createConnection(connectionString);
-    await connection.execute<any>(
+    await this.connection.query(
       `INSERT INTO orders (id_order, code, cpf, total, freight) VALUES (?, ?, ?, ?, ?);`,
       [
         order.idOrder,
@@ -32,17 +24,12 @@ export default class OrderRepositoryDatabase implements OrderRepository {
         order.freight,
       ]
     );
-    connection.commit();
-    connection.destroy();
   }
   async get(idOrder: string): Promise<any> {
-    const connectionString = `mysql://root:admin@localhost:3306/ecommerce`;
-    const connection = await mysql.createConnection(connectionString);
-    const [orders] = await connection.query<any>(
+    const [orders] = await this.connection.query(
       `SELECT * FROM orders WHERE id_order = ?;`,
       [idOrder]
     );
-    connection.destroy();
     return orders[0];
   }
 }

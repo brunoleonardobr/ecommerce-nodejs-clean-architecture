@@ -1,5 +1,5 @@
-import type CouponRepository from "./CouponRepository";
-import type RepositoryFactory from "./RepositoryFactory";
+import CouponRepository from "./CouponRepository";
+import RepositoryFactory from "./RepositoryFactory";
 
 export default class ValidateCoupon {
   couponRepository: CouponRepository;
@@ -12,7 +12,7 @@ export default class ValidateCoupon {
     };
     const coupon = await this.couponRepository.get(code);
     const today = new Date();
-    output.isValid = coupon.isValid(today);
+    if (coupon) output.isValid = coupon.isValid(today);
     return output;
   }
 }

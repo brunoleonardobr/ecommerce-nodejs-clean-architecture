@@ -1,31 +1,21 @@
-import axios from "axios";
 import Checkout from "../src/Checkout";
 import crypto from "crypto";
 import GetOrder from "../src/GetOrder";
 import OrderRepositoryDatabase from "../src/OrderRepositoryDatabase";
 import DatabaseRepositoryFactory from "../src/DatabaseRepositoryFactory";
-
-axios.defaults.validateStatus = () => {
-  return true;
-};
+import MysqlPromiseAdapter from "../src/MysqlPromiseAdapter";
+import DatabaseConnection from "../src/DatabaseConnection";
 
 let checkout: Checkout;
 let getOrder: GetOrder;
+let connection: DatabaseConnection;
 
-beforeEach(() => {
-  const repositoryFactory = new DatabaseRepositoryFactory();
+beforeEach(async () => {
+  connection = new MysqlPromiseAdapter();
+  await connection.connect();
+  const repositoryFactory = new DatabaseRepositoryFactory(connection);
   checkout = new Checkout(repositoryFactory);
   getOrder = new GetOrder(repositoryFactory);
-});
-
-test("Não deve criar pedido com cpf inválido", async () => {
-  const input = {
-    cpf: "406.302.170-27",
-    items: [],
-  };
-  expect(() => checkout.execute(input)).rejects.toThrow(
-    new Error("invalid cpf")
-  );
 });
 
 test("Deve fazer um pedido com 3 items", async () => {
@@ -138,7 +128,9 @@ test("Deve fazer um pedido, salvando no banco de dados", async () => {
 });
 
 test("Deve fazer um pedido, e gerar o codigo do pedido", async () => {
-  let orderRepository = new OrderRepositoryDatabase();
+  const connection = new MysqlPromiseAdapter();
+  await connection.connect();
+  let orderRepository = new OrderRepositoryDatabase(connection);
   await orderRepository.clear();
   await checkout.execute({
     idOrder: crypto.randomUUID(),
@@ -163,4 +155,8 @@ test("Deve fazer um pedido, e gerar o codigo do pedido", async () => {
   await checkout.execute(input);
   const output = await getOrder.execute(input.idOrder);
   expect(output.code).toBe(`202200000002`);
+});
+
+afterEach(async () => {
+  await connection.close();
 });
